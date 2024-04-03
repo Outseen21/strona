@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { TextField, Button, List, ListItem, ListItemText, IconButton, ThemeProvider, createTheme } from '@mui/material';
+import { TextField, Button, List, ListItem, ListItemText, IconButton, Input, ThemeProvider, createTheme } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save'; 
 import './App.css';
 
 function App() {
   const [activity, setActivity] = useState('');
   const [activitiesList, setActivitiesList] = useState([]);
+  const [editIndex, setEditIndex] = useState(null); 
+  const [editedActivity, setEditedActivity] = useState(''); 
 
   const handleChange = (event) => {
     setActivity(event.target.value);
@@ -19,7 +23,7 @@ function App() {
   };
 
   const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && editIndex === null) {
       addActivity();
     }
   };
@@ -27,6 +31,29 @@ function App() {
   const removeActivity = (index) => {
     const newActivitiesList = activitiesList.filter((_, idx) => idx !== index);
     setActivitiesList(newActivitiesList);
+  };
+  
+  const handleEditKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      saveEdit();
+    }
+  };
+
+  const startEdit = (index) => {
+    setEditIndex(index);
+    setEditedActivity(activitiesList[index]);
+  };
+
+  const handleEditChange = (event) => {
+    setEditedActivity(event.target.value);
+  };
+
+  const saveEdit = () => {
+    const updatedActivities = [...activitiesList];
+    updatedActivities[editIndex] = editedActivity.trim();
+    setActivitiesList(updatedActivities);
+    setEditIndex(null);
+    setEditedActivity('');
   };
 
   const theme = createTheme();
@@ -45,24 +72,41 @@ function App() {
           fullWidth
           margin="normal"
         />
-        <Button 
-          variant="contained" 
-          onClick={addActivity} 
+        <Button
+          variant="contained"
+          onClick={addActivity}
           style={{ marginBottom: '20px' }}
+          disabled={editIndex !== null} 
         >
           Dodaj
         </Button>
         <List>
-          {activitiesList.map((activity, index) => (
-            <ListItem
-              key={index}
-              secondaryAction={
-                <IconButton edge="end" aria-label="delete" onClick={() => removeActivity(index)}>
-                  <DeleteIcon />
-                </IconButton>
-              }
-            >
-              <ListItemText primary={activity} />
+          {activitiesList.map((item, index) => (
+            <ListItem key={index}>
+              {editIndex === index ? (
+                <Input
+                  value={editedActivity}
+                  onChange={handleEditChange}
+                  onKeyPress={handleEditKeyPress} 
+                  fullWidth
+                  autoFocus
+                  endAdornment={
+                    <IconButton onClick={saveEdit}>
+                      <SaveIcon />
+                    </IconButton>
+                  }
+                />
+              ) : (
+                <>
+                  <ListItemText primary={item} />
+                  <IconButton edge="end" aria-label="edit" onClick={() => startEdit(index)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton edge="end" aria-label="delete" onClick={() => removeActivity(index)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </>
+              )}
             </ListItem>
           ))}
         </List>
