@@ -49,13 +49,18 @@ function App() {
   };
 
   const saveEdit = () => {
-    const updatedActivities = [...activitiesList];
-    updatedActivities[editIndex] = editedActivity.trim();
-    setActivitiesList(updatedActivities);
-    setEditIndex(null);
-    setEditedActivity('');
-  };
-
+    if (editedActivity.trim() === '') {
+     const isDeleteConfirmed = window.confirm('Czy na pewno chcesz usunąć tę czynność?');
+     if (isDeleteConfirmed) {
+       const updatedActivities = activitiesList.filter((_, idx) => idx !== editIndex);
+       setActivitiesList(updatedActivities); } 
+   } else { 
+     const updatedActivities = [...activitiesList];
+     updatedActivities[editIndex] = editedActivity.trim();
+     setActivitiesList(updatedActivities);}
+   setEditIndex(null);
+   setEditedActivity('');
+ };
   const theme = createTheme();
 
   return (
