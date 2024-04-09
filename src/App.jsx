@@ -134,7 +134,7 @@ function App() {
               }>
                 <ListItemText
                   primary={item.activity}
-                  secondary={`Data: ${item.date ? item.date.toLocaleDateString() : ''}, Miejsce: ${item.place}, Godzina: ${item.time ? item.time.toLocaleTimeString() : ''}`}
+                  secondary={`Data: ${item.date ? item.date.toLocaleDateString() : ''}, Godzina: ${item.time ? item.time.toLocaleTimeString() : ''},Miejsce: ${item.place}`}
                 />
               </ListItem>
             ))}
