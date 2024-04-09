@@ -103,7 +103,7 @@ function App() {
           <Button
             variant="contained"
             onClick={editIndex === -1 ? addActivity : saveEdit}
-            style={{ marginTop: '20px' }}
+            className="addButton"
           >
             {editIndex === -1 ? 'Dodaj' : 'Zapisz'}
           </Button>
