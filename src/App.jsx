@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, List, ListItem, ListItemText, IconButton, ThemeProvider, createTheme, Grid } from '@mui/material';
+import {
+  TextField, Button, List, ListItem, ListItemText, IconButton, ThemeProvider, createTheme, Grid
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import './App.css'; 
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import './App.css';
 
 function App() {
   const [activityDetails, setActivityDetails] = useState({
     activity: '',
-    date: '',
-    time: '',
+    date: null, // Zaktualizowane na null dla DatePicker
+    time: null, // Zaktualizowane na null dla TimePicker
     place: '',
   });
   const [activitiesList, setActivitiesList] = useState([]);
@@ -21,7 +26,7 @@ function App() {
   const addActivity = () => {
     if (activityDetails.activity.trim() !== '') {
       setActivitiesList([...activitiesList, { ...activityDetails }]);
-      setActivityDetails({ activity: '', date: '', time: '', place: '' });
+      setActivityDetails({ activity: '', date: null, time: null, place: '' });
     }
   };
 
@@ -42,7 +47,7 @@ function App() {
     updatedActivities[editIndex] = { ...activityDetails };
     setActivitiesList(updatedActivities);
     setEditIndex(-1);
-    setActivityDetails({ activity: '', date: '', time: '', place: '' });
+    setActivityDetails({ activity: '', date: null, time: null, place: '' });
   };
 
   useEffect(() => {
@@ -60,80 +65,82 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <div className="App">
-        <h1>Hej!</h1>
-        <p>Wybierz dzisiejszą czynność. Co dzisiaj będziesz robić?</p>
-        <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={12} sx={{ mb: 2 }}>
-            <TextField
-              label="Czynność"
-              variant="outlined"
-              value={activityDetails.activity}
-              onChange={(e) => handleChange(e, 'activity')}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <TextField
-              label="Data"
-              variant="outlined"
-              value={activityDetails.date}
-              onChange={(e) => handleChange(e, 'date')}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <TextField
-              label="Godzina"
-              variant="outlined"
-              value={activityDetails.time}
-              onChange={(e) => handleChange(e, 'time')}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <TextField
-              label="Miejsce"
-              variant="outlined"
-              value={activityDetails.place}
-              onChange={(e) => handleChange(e, 'place')}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              onClick={editIndex === -1 ? addActivity : saveEdit}
-              className="addButton margin-bottom-medium"
-            >
-              {editIndex === -1 ? 'Dodaj' : 'Zapisz'}
-            </Button>
-          </Grid>
-        </Grid>
-        <List>
-          {activitiesList.map((item, index) => (
-            <ListItem key={index} secondaryAction={
-              <>
-                <IconButton edge="end" aria-label="edit" onClick={() => startEdit(index)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton edge="end" aria-label="delete" onClick={() => removeActivity(index)}>
-                  <DeleteIcon />
-                </IconButton>
-              </>
-            }>
-              <ListItemText
-                primary={item.activity}
-                secondary={`Data: ${item.date}, Miejsce: ${item.place}, Godzina: ${item.time}`}
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <div className="App">
+          <h1>Hej!</h1>
+          <p>Wybierz dzisiejszą czynność. Co dzisiaj będziesz robić?</p>
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <Grid item xs={12} sx={{ mb: 2 }}>
+              <TextField
+                label="Czynność"
+                variant="outlined"
+                value={activityDetails.activity}
+                onChange={(e) => handleChange(e, 'activity')}
+                fullWidth
+                sx={{ mb: 1 }}
               />
-            </ListItem>
-          ))}
-        </List>
-      </div>
+            </Grid>
+            <Grid item xs={4}>
+              <DatePicker
+                label="Data"
+                value={activityDetails.date}
+                onChange={(newValue) => {
+                  setActivityDetails({ ...activityDetails, date: newValue });
+                }}
+                renderInput={(params) => <TextField {...params} fullWidth sx={{ mb: 1 }}/>}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TimePicker
+                label="Godzina"
+                value={activityDetails.time}
+                onChange={(newValue) => {
+                  setActivityDetails({ ...activityDetails, time: newValue });
+                }}
+                renderInput={(params) => <TextField {...params} fullWidth sx={{ mb: 1 }}/>}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField
+                label="Miejsce"
+                variant="outlined"
+                value={activityDetails.place}
+                onChange={(e) => handleChange(e, 'place')}
+                fullWidth
+                sx={{ mb: 1 }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                onClick={editIndex === -1 ? addActivity : saveEdit}
+                className="addButton"
+              >
+                {editIndex === -1 ? 'Dodaj' : 'Zapisz'}
+              </Button>
+            </Grid>
+          </Grid>
+          <List>
+            {activitiesList.map((item, index) => (
+              <ListItem key={index} secondaryAction={
+                <>
+                  <IconButton edge="end" aria-label="edit" onClick={() => startEdit(index)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton edge="end" aria-label="delete" onClick={() => removeActivity(index)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </>
+              }>
+                <ListItemText
+                  primary={item.activity}
+                  secondary={`Data: ${item.date ? item.date.toLocaleDateString() : ''}, Miejsce: ${item.place}, Godzina: ${item.time ? item.time.toLocaleTimeString() : ''}`}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </div>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }
