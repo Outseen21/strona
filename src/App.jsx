@@ -12,8 +12,8 @@ import './App.css';
 function App() {
   const [activityDetails, setActivityDetails] = useState({
     activity: '',
-    date: null, // Zaktualizowane na null dla DatePicker
-    time: null, // Zaktualizowane na null dla TimePicker
+    date: null, 
+    time: null, 
     place: '',
   });
   const [activitiesList, setActivitiesList] = useState([]);
